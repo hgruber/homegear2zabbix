@@ -5,6 +5,7 @@ import xmlrpclib
 import json
 from zabbix.sender import ZabbixMetric, ZabbixSender
 
+homegear_host = "balmung"
 zabbix_host = "balmung"
 application = "homegear"
 types   = {
@@ -20,7 +21,7 @@ def get_devices():
     devices = {}
     data = {}
     message = []
-    homegear = xmlrpclib.ServerProxy('http://'+zabbix_host+':2001')
+    homegear = xmlrpclib.ServerProxy('http://'+homegear_host+':2001')
     for device in homegear.listDevices(False, ('FAMILY', 'ID', 'ADDRESS', 'TYPE', 'FIRMWARE')):
         info = homegear.getDeviceInfo(device['ID'], ('NAME', 'RSSI', 'INTERFACE'))
         name = info['NAME']
@@ -65,5 +66,5 @@ get_devices()
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
-client.connect('balmung', 1883, 60)
+client.connect(homegear_host, 1883, 60)
 client.loop_forever()
