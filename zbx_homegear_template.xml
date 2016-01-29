@@ -54,7 +54,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>10</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
@@ -178,7 +178,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>10</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
@@ -345,7 +345,7 @@
                         <formula/>
                         <conditions/>
                     </filter>
-                    <lifetime>10</lifetime>
+                    <lifetime>0</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
