@@ -15,7 +15,6 @@ types   = {
 }
 sensors = {}
 devicetypes = {}
-# values  = {}
 
 def get_devices():
     devices = {}
@@ -25,7 +24,7 @@ def get_devices():
     for device in homegear.listDevices(False, ('FAMILY', 'ID', 'ADDRESS', 'TYPE', 'FIRMWARE')):
         info = homegear.getDeviceInfo(device['ID'], ('NAME', 'RSSI', 'INTERFACE'))
         name = info['NAME']
-        if name == '': name = device['ADDRESS']
+        if name == '': continue # don't discover unnamed devices
         devicetype = application+'.discovery.'+get_device_type(device['TYPE'])
         if devicetype not in devices: devices[devicetype] = []
         devices[devicetype].append({ '{#SENSOR}': name })
@@ -53,10 +52,6 @@ def on_message(client, userdata, msg):
     typ = devicetypes[device]
     parameter = re.sub( r'.*/event/.*/', '', msg.topic).lower()
     value = re.sub( r'\[(.*)\]', '\\1', msg.payload)
-#    if (name in values and parameter in values[name] and values[name][parameter] == value):
-#        return # don't send values that have not changed
-#    if (name not in values): values[name] = {}
-#    values[name][parameter] = value
     message = []
     message.append(ZabbixMetric(zabbix_host, application+'.'+typ+'.'+parameter+'['+name+']', value))
     ZabbixSender(zabbix_host, 10051).send(message)
