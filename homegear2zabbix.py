@@ -35,9 +35,10 @@ def get_devices():
         devices[devicetype].append({ '{#SENSOR}': name })
         sensors[int(device['ID'])] = name
         devicetypes[int(device['ID'])] = get_device_type(device['TYPE'])
-        print device['TYPE'] + ': ' + name
+        print device['TYPE'] + ': ' + name + ' (' + devicetype + ')'
     for devicetype in devices:
         data['data'] = devices[devicetype]
+        print devicetype, data['data']
         message.append(ZabbixMetric(zabbix_host, devicetype, json.dumps(data)))
     ZabbixSender(zabbix_host, 10051).send(message)
 
