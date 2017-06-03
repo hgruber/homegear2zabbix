@@ -5,10 +5,12 @@ import xmlrpclib
 import json
 from zabbix.sender import ZabbixMetric, ZabbixSender
 from datetime import datetime
+from socket import gethostname
 
 homegear_host = "balmung"
-zabbix_host = "balmung"
-application = "homegear"
+zabbix_host   = gethostname()
+zabbix_server = "balmung"
+application   = "homegear"
 low_level_discovery_update_period = 3600
 types   = {
     "climate":  re.compile('^HM-WDS.*-TH-'), 
