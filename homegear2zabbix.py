@@ -8,7 +8,7 @@ from datetime import datetime
 from socket import gethostname
 
 homegear_host = "balmung"
-zabbix_host   = gethostname()
+zabbix_host   = "balmung"
 zabbix_server = "balmung"
 application   = "homegear"
 low_level_discovery_update_period = 3600
@@ -16,7 +16,9 @@ types   = {
     "climate":  re.compile('^HM-WDS.*-TH-'), 
     "thermostat": re.compile('^HM-CC-RT-DN'),
     "actor": re.compile('^HM-LC-Sw1-Pl-DN-R1'),
-    "door": re.compile('^HM-Sec-SCo')
+    "door": re.compile('^HM-Sec-SCo'),
+    "blind": re.compile('HM-LC-Bl1-SM'),
+    "raindetect": re.compile('HM-Sen-RD-O')
 }
 sensors = {}
 devicetypes = {}
@@ -52,6 +54,14 @@ def get_device_type(name):
 def on_connect(client, userdata, flags, rc):
     client.subscribe("/#")
 
+def send_message(typ, parameter, channel, name, value):
+    if value=='false': value=0
+    if value=='true': value=1
+    if (typ == 'raindetect' and parameter == 'state' and channel == 2): parameter = 'heating'
+    message = []
+    message.append(ZabbixMetric(zabbix_host, application+'.'+typ+'.'+parameter+'['+name+']', value))
+    ZabbixSender(zabbix_host, 10051).send(message)
+
 def on_message(client, userdata, msg):
     global last_update # modify global variable
     device = int(re.sub( r'.*/event/([0-9]*)/.*', '\\1', msg.topic))
@@ -61,12 +71,9 @@ def on_message(client, userdata, msg):
     name = sensors[device]
     typ = devicetypes[device]
     parameter = re.sub( r'.*/event/.*/', '', msg.topic).lower()
+    channel = int(re.sub( r'.*/event/[0-9]*/([0-9]*)/.*', '\\1', msg.topic))
     value = re.sub( r'\[(.*)\]', '\\1', msg.payload)
-    if value=='false': value=0
-    if value=='true': value=1
-    message = []
-    message.append(ZabbixMetric(zabbix_host, application+'.'+typ+'.'+parameter+'['+name+']', value))
-    ZabbixSender(zabbix_host, 10051).send(message)
+    send_message(typ, parameter, channel, name, value)
     if ((datetime.now()-last_update).seconds > low_level_discovery_update_period):
         last_update = datetime.now()
         get_devices()
