@@ -17,7 +17,7 @@ types   = {
     "thermostat": re.compile('^HM-CC-RT-DN'),
     "actor": re.compile('^HM-LC-Sw1-Pl-DN-R1'),
     "door": re.compile('^HM-Sec-SCo'),
-    "blind": re.compile('HM-LC-Bl1-SM'),
+    "motor": re.compile('HM-LC-Bl1-SM'),
     "raindetect": re.compile('HM-Sen-RD-O')
 }
 sensors = {}
