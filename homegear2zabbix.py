@@ -11,13 +11,15 @@ homegear_host = "balmung"
 zabbix_host   = "balmung"
 zabbix_server = "balmung"
 application   = "homegear"
+mqtt_subject  = "homegear/#"
 low_level_discovery_update_period = 3600
 types   = {
     "climate":  re.compile('^HM-WDS.*-TH-'), 
     "thermostat": re.compile('^HM-CC-RT-DN'),
     "actor": re.compile('^HM-LC-Sw1-Pl-DN-R1'),
+    "switch": re.compile('^HM-RC-2-PBU-FM'),
     "door": re.compile('^HM-Sec-SCo'),
-    "motor": re.compile('HM-LC-Bl1-SM'),
+    "blind": re.compile('HM-LC-Bl1-SM'),
     "raindetect": re.compile('HM-Sen-RD-O')
 }
 sensors = {}
@@ -44,7 +46,7 @@ def get_devices():
         data['data'] = devices[devicetype]
         print devicetype, data['data']
         message.append(ZabbixMetric(zabbix_host, devicetype, json.dumps(data)))
-    ZabbixSender(zabbix_host, 10051).send(message)
+        ZabbixSender(zabbix_host, 10051).send(message)
 
 def get_device_type(name):
     for devicetype in types:
@@ -52,7 +54,7 @@ def get_device_type(name):
     return name
 
 def on_connect(client, userdata, flags, rc):
-    client.subscribe("/#")
+    client.subscribe(mqtt_subject)
 
 def send_message(typ, parameter, channel, name, value):
     if value=='false': value=0
